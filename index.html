@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="This webpage allows users to perform text manipulation tasks such as replacing specific characters or strings, adding text at the beginning or end of each line, and adding line numbers.">
-  <title>Text Manipulation Tool | text editor</title>
+  <title>Text Manipulation Tool | Text Editor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,82 +14,73 @@
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
       padding: 20px;
     }
 
     h1 {
-      font-size: 36px;
+      font-size: 24px;
       color: #333;
       text-align: center;
       margin-bottom: 20px;
     }
 
     p {
-      font-size: 16px;
+      font-size: 14px;
       color: #666;
       text-align: justify;
       margin-bottom: 20px;
     }
 
     .content {
-      width: 100%;
-      max-width: 800px;
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: center;
     }
 
     .box {
       background-color: #f9f9f9;
       padding: 20px;
       border-radius: 10px;
-      margin-right: 20px;
       width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
     }
 
     textarea {
-      width: calc(100% - 20px);
-      min-height: 300px;
+      width: calc(100% - 40px);
+      min-height: 150px;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
       resize: vertical;
       box-sizing: border-box;
-      font-size: 16px;
+      font-size: 14px;
       margin-bottom: 10px;
     }
 
-    .additional-text {
-      display: none;
-    }
-
+    .additional-text,
     .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .checkbox-container input[type="checkbox"] {
-      margin-right: 10px;
+      width: 100%;
+      margin-bottom: 10px;
     }
 
     .additional-text input[type="text"] {
-      width: calc(100% - 5px);
+      width: calc(100% - 20px);
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
       box-sizing: border-box;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .replacer-container {
-      margin-bottom: 20px;
+      display: none; /* Initially hidden */
+      margin-bottom: 10px;
+    }
+
+    .replacer-container.active {
+      display: block; /* Display when active */
     }
 
     .replacer-container .row {
@@ -99,29 +90,37 @@
     }
 
     .replacer-container .row input[type="text"] {
-      width: calc(50% - 5px);
+      width: calc(50% - 15px);
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
       margin-right: 10px;
       box-sizing: border-box;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .replacer-container .row .icon {
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer;
     }
 
+    .replacer-checkbox-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .replacer-checkbox-container input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
     .convert-button {
-      display: block;
-      width: calc(100% - 20px);
+      width: 100%;
       padding: 15px;
       border: none;
       border-radius: 5px;
       background-color: #007bff;
       color: #fff;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
     }
 
@@ -133,7 +132,9 @@
       background-color: #f9f9f9;
       padding: 20px;
       border-radius: 10px;
-      width: 50%;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
     }
 
     pre {
@@ -142,8 +143,7 @@
     }
 
     .button-container {
-      display: flex;
-      justify-content: space-between;
+      width: 100%;
       margin-top: 20px;
     }
 
@@ -161,15 +161,20 @@
       background-color: #0056b3;
     }
 
-    .remove-lines-checkbox-container,
-    .checkbox-container {
-      width: 50%;
-    }
+    @media only screen and (min-width: 600px) {
+      .content {
+        flex-direction: row;
+        justify-content: space-between;
+      }
 
-    .remove-lines-checkbox-container {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
+      .box {
+        width: calc(50% - 20px);
+        margin-right: 20px;
+      }
+
+      .notepad {
+        width: calc(50% - 20px);
+      }
     }
 
   </style>
@@ -183,24 +188,26 @@
       <li>You can add text at the beginning or end of each line.</li>
       <li>You can add line numbers at the beginning of each line.</li>
       <li>You can remove all line breaks and make the text a single line.</li>
-      <li>You can remove all empty line.</li>
+      <li>You can remove all empty lines.</li>
     </ul>
     <div class="content">
       <div class="box">
         <textarea id="inputBox" rows="3" placeholder="Enter your text here"></textarea>
-        <div class="checkbox-container">
-          <input type="checkbox" id="beginningCheckbox" onchange="toggleAdditionalTextInputs()">
-          <label for="beginningCheckbox">Add text at the Beginning</label>
-        </div>
-          <div id="beginningTextRow" class="additional-text">
+        <div class="additional-text">
+          <div class="checkbox-container">
+            <input type="checkbox" id="beginningCheckbox" onchange="toggleAdditionalTextInputs()">
+            <label for="beginningCheckbox">Add text at the Beginning</label>
+          </div>
+          <div id="beginningTextRow" class="additional-text" style="display: none;">
             <input type="text" placeholder="Text to add at the beginning">
           </div>
-        <div class="checkbox-container">
-          <input type="checkbox" id="endCheckbox" onchange="toggleAdditionalTextInputs()">
-          <label for="endCheckbox">Add text at the End</label>
-        </div>
-          <div id="endTextRow" class="additional-text">
+          <div class="checkbox-container">
+            <input type="checkbox" id="endCheckbox" onchange="toggleAdditionalTextInputs()">
+            <label for="endCheckbox">Add text at the End</label>
+          </div>
+          <div id="endTextRow" class="additional-text" style="display: none;">
             <input type="text" placeholder="Text to add at the end">
+          </div>
         </div>
         <div class="checkbox-container">
           <input type="checkbox" id="lineNumberCheckbox">
@@ -214,7 +221,10 @@
           <input type="checkbox" id="lineBreakerCheckbox">
           <label for="lineBreakerCheckbox">Make single line</label>
         </div>
-        <h2>REPLACER</h2>
+        <div class="replacer-checkbox-container">
+          <input type="checkbox" id="replacerCheckbox" onchange="toggleReplacer()">
+          <label for="replacerCheckbox">Use Replacer</label>
+        </div>
         <div class="replacer-container" id="replaceBox">
           <div class="row">
             <input type="text" placeholder="Text to replace">
@@ -225,7 +235,7 @@
         <button class="convert-button" onclick="convertText()">LETS GO</button>
       </div>
       <div class="notepad" id="notepadSection">
-        <h2>COPY OUT</h2>
+        <h2>𝙲𝙾𝙿𝚈 𝙾𝚄𝚃</h2>
         <pre id="notepadContent"></pre>
         <div class="button-container" id="copyButtonContainer" style="display: none;">
           <button class="copy-button" onclick="copyText()">COPY ALL</button>
@@ -243,6 +253,17 @@
 
       beginningTextRow.style.display = beginningCheckbox.checked ? "block" : "none";
       endTextRow.style.display = endCheckbox.checked ? "block" : "none";
+    }
+
+    function toggleReplacer() {
+      const replacerCheckbox = document.getElementById("replacerCheckbox");
+      const replacerContainer = document.getElementById("replaceBox");
+
+      if (replacerCheckbox.checked) {
+        replacerContainer.classList.add("active");
+      } else {
+        replacerContainer.classList.remove("active");
+      }
     }
 
     function addRowReplace() {
@@ -271,6 +292,7 @@
       const addLineNumbers = document.getElementById("lineNumberCheckbox").checked;
       const removeLines = document.getElementById("removeLinesCheckbox").checked;
       const lineBreaker = document.getElementById("lineBreakerCheckbox").checked;
+      const useReplacer = document.getElementById("replacerCheckbox").checked;
 
       if (beginningText) {
         text = text.split('\n').map(line => beginningText + line).join('\n');
@@ -280,14 +302,16 @@
         text = text.split('\n').map(line => line + endText).join('\n');
       }
 
-      const replaceRows = document.querySelectorAll("#replaceBox .row");
-      replaceRows.forEach(row => {
-        const textInput = row.querySelector("input:first-child");
-        const replaceInput = row.querySelector("input:nth-child(2)");
-        const replaceText = replaceInput.value;
-        text = text.replace(new RegExp(textInput.value, "g"), replaceText);
-      });
-      
+      if (useReplacer) {
+        const replaceRows = document.querySelectorAll("#replaceBox .row");
+        replaceRows.forEach(row => {
+          const textInput = row.querySelector("input:first-child");
+          const replaceInput = row.querySelector("input:nth-child(2)");
+          const replaceText = replaceInput.value;
+          text = text.replace(new RegExp(textInput.value, "g"), replaceText);
+        });
+      }
+
       if (removeLines) {
         text = text.replace(/^\s*[\r\n]/gm, '').replace(/[\r\n\s]*$/, '');
       }
