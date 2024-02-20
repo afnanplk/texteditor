@@ -107,10 +107,70 @@
     .replacer-checkbox-container {
       display: flex;
       align-items: center;
+      margin-bottom: 10px;
     }
 
-    .replacer-checkbox-container input[type="checkbox"] {
-      margin-right: 10px;
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px; /* Smaller width */
+      height: 20px; /* Smaller height */
+      margin-right: 10px; /* Added margin */
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 20px; /* Half of height */
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px; /* Smaller height */
+      width: 16px; /* Smaller width */
+      left: 2px; /* Adjusted position */
+      bottom: 2px; /* Adjusted position */
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #007bff;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #007bff;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(20px); /* Half of width */
+      -ms-transform: translateX(20px); /* Half of width */
+      transform: translateX(20px); /* Half of width */
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 20px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
     }
 
     .convert-button {
@@ -194,15 +254,35 @@
       <div class="box">
         <textarea id="inputBox" rows="3" placeholder="Enter your text here"></textarea>
         <div class="additional-text">
-          <div class="checkbox-container">
-            <input type="checkbox" id="beginningCheckbox" onchange="toggleAdditionalTextInputs()">
+          <div class="replacer-checkbox-container checkbox-container">
+            <label class="switch">
+              <input type="checkbox" id="replacerCheckbox" onchange="toggleReplacer()">
+              <span class="slider round"></span>
+            </label>
+            <label for="replacerCheckbox">Use Replacer</label>
+          </div>
+          <div class="replacer-container" id="replaceBox">
+            <div class="row">
+              <input type="text" placeholder="Text to replace">
+              <input type="text" placeholder="Replacement text">
+              <span class="icon" onclick="addRowReplace()">+</span>
+            </div>
+          </div>
+          <div class="replacer-checkbox-container checkbox-container">
+            <label class="switch">
+              <input type="checkbox" id="beginningCheckbox" onchange="toggleTextPosition()">
+              <span class="slider round"></span>
+            </label>
             <label for="beginningCheckbox">Add text at the Beginning</label>
           </div>
           <div id="beginningTextRow" class="additional-text" style="display: none;">
             <input type="text" placeholder="Text to add at the beginning">
           </div>
-          <div class="checkbox-container">
-            <input type="checkbox" id="endCheckbox" onchange="toggleAdditionalTextInputs()">
+          <div class="replacer-checkbox-container checkbox-container">
+            <label class="switch">
+              <input type="checkbox" id="endCheckbox" onchange="toggleTextPosition()">
+              <span class="slider round"></span>
+            </label>
             <label for="endCheckbox">Add text at the End</label>
           </div>
           <div id="endTextRow" class="additional-text" style="display: none;">
@@ -210,32 +290,30 @@
           </div>
         </div>
         <div class="checkbox-container">
-          <input type="checkbox" id="lineNumberCheckbox">
+          <label class="switch">
+            <input type="checkbox" id="lineNumberCheckbox">
+            <span class="slider round"></span>
+          </label>
           <label for="lineNumberCheckbox">Add Line Numbers</label>
         </div>
         <div class="checkbox-container">
-          <input type="checkbox" id="removeLinesCheckbox">
+          <label class="switch">
+            <input type="checkbox" id="removeLinesCheckbox">
+            <span class="slider round"></span>
+          </label>
           <label for="removeLinesCheckbox">Remove empty lines</label>
         </div>
         <div class="checkbox-container">
-          <input type="checkbox" id="lineBreakerCheckbox">
+          <label class="switch">
+            <input type="checkbox" id="lineBreakerCheckbox">
+            <span class="slider round"></span>
+          </label>
           <label for="lineBreakerCheckbox">Make single line</label>
-        </div>
-        <div class="replacer-checkbox-container">
-          <input type="checkbox" id="replacerCheckbox" onchange="toggleReplacer()">
-          <label for="replacerCheckbox">Replace a text</label>
-        </div>
-        <div class="replacer-container" id="replaceBox">
-          <div class="row">
-            <input type="text" placeholder="Text to replace">
-            <input type="text" placeholder="Replacement text">
-            <span class="icon" onclick="addRowReplace()">+</span>
-          </div>
         </div>
         <button class="convert-button" onclick="convertText()">LETS GO</button>
       </div>
       <div class="notepad" id="notepadSection">
-        <h2>𝙲𝙾𝙿𝚈 𝙾𝚄𝚃</h2>
+        <h2>COPY OUT</h2>
         <pre id="notepadContent"></pre>
         <div class="button-container" id="copyButtonContainer" style="display: none;">
           <button class="copy-button" onclick="copyText()">COPY ALL</button>
@@ -245,16 +323,6 @@
   </div>
 
   <script>
-    function toggleAdditionalTextInputs() {
-      const beginningCheckbox = document.getElementById("beginningCheckbox");
-      const endCheckbox = document.getElementById("endCheckbox");
-      const beginningTextRow = document.getElementById("beginningTextRow");
-      const endTextRow = document.getElementById("endTextRow");
-
-      beginningTextRow.style.display = beginningCheckbox.checked ? "block" : "none";
-      endTextRow.style.display = endCheckbox.checked ? "block" : "none";
-    }
-
     function toggleReplacer() {
       const replacerCheckbox = document.getElementById("replacerCheckbox");
       const replacerContainer = document.getElementById("replaceBox");
@@ -264,6 +332,16 @@
       } else {
         replacerContainer.classList.remove("active");
       }
+    }
+
+    function toggleTextPosition() {
+      const beginningCheckbox = document.getElementById("beginningCheckbox");
+      const endCheckbox = document.getElementById("endCheckbox");
+      const beginningTextRow = document.getElementById("beginningTextRow");
+      const endTextRow = document.getElementById("endTextRow");
+
+      beginningTextRow.style.display = beginningCheckbox.checked ? "block" : "none";
+      endTextRow.style.display = endCheckbox.checked ? "block" : "none";
     }
 
     function addRowReplace() {
@@ -293,12 +371,18 @@
       const removeLines = document.getElementById("removeLinesCheckbox").checked;
       const lineBreaker = document.getElementById("lineBreakerCheckbox").checked;
       const useReplacer = document.getElementById("replacerCheckbox").checked;
+      const addBeginningText = document.getElementById("beginningCheckbox").checked;
+      const addEndText = document.getElementById("endCheckbox").checked;
 
-      if (beginningText) {
+      if (removeLines) {
+        text = text.replace(/^\s*[\r\n]/gm, '').replace(/[\r\n\s]*$/, '');
+      }
+
+      if (addBeginningText && beginningText) {
         text = text.split('\n').map(line => beginningText + line).join('\n');
       }
 
-      if (endText) {
+      if (addEndText && endText) {
         text = text.split('\n').map(line => line + endText).join('\n');
       }
 
@@ -312,16 +396,12 @@
         });
       }
 
-      if (removeLines) {
-        text = text.replace(/^\s*[\r\n]/gm, '').replace(/[\r\n\s]*$/, '');
+      if (lineBreaker) {
+        text = text.replace(/\n/g, '');
       }
 
       if (addLineNumbers) {
         text = text.split('\n').map((line, index) => (index + 1) + line).join('\n');
-      }
-
-      if (lineBreaker) {
-        text = text.replace(/\n/g, '');
       }
 
       notepadContent.innerHTML = text;
